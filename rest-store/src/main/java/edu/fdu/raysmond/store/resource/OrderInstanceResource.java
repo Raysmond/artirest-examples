@@ -31,6 +31,7 @@ import edu.fdu.raysmond.store.entity.Shipment;
 import edu.fdu.raysmond.store.entity.ShipmentState;
 import edu.fdu.raysmond.store.entity.UserRole;
 import edu.fdu.raysmond.store.util.HibernateUtil;
+import edu.fdu.raysmond.store.util.JSONUtil;
 import edu.fdu.raysmond.store.util.Util;
 
 public class OrderInstanceResource {
@@ -147,8 +148,7 @@ public class OrderInstanceResource {
 		if (order.getState() != OrderState.Customer_creating_shipping) {
 			return Response.status(403).entity(Util.wrongState()).build();
 		}
-		if (input.has("customer_name") && input.has("address") && !input.getString("customer_name").equals("")
-				&& !input.getString("address").equals("")) {
+		if (JSONUtil.notEmptyStrings(input, "customer_name", "address")) {
 			if (null == shipment)
 				shipment = new Shipment();
 			shipment.setCustomerName(input.getString("customer_name"));
