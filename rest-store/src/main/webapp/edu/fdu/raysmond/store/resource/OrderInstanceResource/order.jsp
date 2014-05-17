@@ -22,7 +22,7 @@
 					<div class="col-sm-4" style="font-weight: bold;">Total amount</div>
 					<div class="col-sm-8">${it.total}</div>
 					<div class="col-sm-4" style="font-weight: bold;">Status</div>
-					<div class="col-sm-8">${it.state}</div>
+					<div class="col-sm-8"><span class="label label-info">${it.state}</span></div>
 					<div class="col-sm-4" style="font-weight: bold;">Bill</div>
 					<div class="col-sm-8">
 						<c:if test="${it.billDate!=null}">
@@ -63,7 +63,7 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-4" style="font-weight: bold;">Operation</div>
+						<div class="col-sm-4" style="font-weight: bold;">&nbsp;</div>
 						<div class="col-sm-8">
 							<c:if test="${it.state=='Adding_order_item' }">
 								<a class="btn btn-success btn-xs"
@@ -86,6 +86,21 @@
 								<a class="btn btn-success"
 									href="/rest-store/order/${it.id }/confirm">Confirm
 									(manager)</a>
+							</c:if>
+							<c:if test="${it.state=='Order_confirmed' }">
+								<a class="btn btn-success"
+									href="/rest-store/order/${it.id }/shipment/create_shipping">Create
+									a shipment (manager)</a>
+							</c:if>
+							<c:if test="${it.state=='Ready_for_shipping' }">
+								<a class="btn btn-success"
+									href="/rest-store/order/${it.id }/shipment/in_shipping">In
+									shipping (manager)</a>
+							</c:if>
+							<c:if test="${it.state=='In_shipping' }">
+								<a class="btn btn-success"
+									href="/rest-store/order/${it.id }/shipment/shipped">Shipment
+									completion (manager)</a>
 							</c:if>
 							<%
 								}

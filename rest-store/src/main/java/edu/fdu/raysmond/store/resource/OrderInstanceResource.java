@@ -68,12 +68,11 @@ public class OrderInstanceResource {
 	@Path("add_item")
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response getAddItem() throws JSONException {
-		if (order.getState() == OrderState.Adding_order_item) {
-			JSONObject json = new JSONObject();
-			json.put("input", new JSONArray().put("item_id"));
-			return Response.ok().entity(json).build();
-		} else
+		if (order.getState() != OrderState.Adding_order_item) {
 			return Response.status(403).entity(Util.wrongState()).build();
+		}
+		JSONObject json = new JSONObject().put("input", JSONUtil.createInputs("item_id"));
+		return Response.ok().entity(json).build();
 	}
 
 	/**
@@ -94,7 +93,6 @@ public class OrderInstanceResource {
 				result.put("result", false).put("reason", "Item not found");
 			}
 			order.addItem(item);
-			order.setTotal(order.getTotal() + item.getPrice());
 			HibernateUtil.save(order);
 			result.put("result", true);
 		} else {
@@ -113,6 +111,8 @@ public class OrderInstanceResource {
 		Item item = new Item();
 		item.setId(id);
 		boolean result = order.getItems().remove(item);
+		if (result)
+			order.setTotal(order.getTotal() - item.getPrice());
 		HibernateUtil.save(order);
 		return Response.ok().entity(result ? JSONUtil.SUCCESS : JSONUtil.FAILURE).build();
 	}
@@ -217,9 +217,12 @@ public class OrderInstanceResource {
 		}
 
 		JSONObject result = new JSONObject();
-		JSONObject information = new JSONObject().put("total_amount", order.getTotal()).put("order_id", order.getId());
+		JSONObject info = new JSONObject();
+		info.put("total_amount", order.getTotal());
+		info.put("order_id", order.getId());
+
 		JSONArray output = new JSONArray().put("billed").put("amount_paied");
-		result.put("information", information).put("output", output);
+		result.put("information", info).put("output", output);
 
 		return Response.ok().entity(result).build();
 	}

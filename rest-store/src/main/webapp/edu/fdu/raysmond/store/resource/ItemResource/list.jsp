@@ -28,7 +28,8 @@
 											"ORDER_ID");
 									if (null != orderId && orderId >= 0) {
 										String uri = "/rest-store/order/" + orderId + "/add_item";
-							%> <a class="btn btn-success btn-xs"
+							%> 
+							<a class="btn btn-success btn-xs"
 							href="javascript:addItem('<%=uri%>', ${i.id})">Add item</a> <%
  	}
  %>

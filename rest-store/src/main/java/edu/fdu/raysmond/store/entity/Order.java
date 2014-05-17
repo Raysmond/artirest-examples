@@ -24,17 +24,14 @@ import edu.fdu.raysmond.store.util.BaseModel;
  * @author Raysmond
  */
 @Entity
-@Table(name="Customer_Order")
+@Table(name = "Customer_Order")
 @XmlRootElement
 public class Order extends BaseModel {
 	private String customerName;
 
-	@ManyToMany(
-            targetEntity=edu.fdu.raysmond.store.entity.Item.class,
-            cascade ={CascadeType.PERSIST,CascadeType.MERGE},
-            fetch = FetchType.EAGER
-    )
-	@JoinTable(name = "Order_Items") 
+	@ManyToMany(targetEntity = edu.fdu.raysmond.store.entity.Item.class, cascade = { CascadeType.PERSIST,
+			CascadeType.MERGE }, fetch = FetchType.EAGER)
+	@JoinTable(name = "Order_Items")
 	private Collection<Item> items = new ArrayList<Item>();
 
 	private double total = 0.0;
@@ -94,9 +91,10 @@ public class Order extends BaseModel {
 	public void setState(OrderState state) {
 		this.state = state;
 	}
-	
-	public void addItem(Item i){
+
+	public void addItem(Item i) {
 		this.items.add(i);
+		this.total += i.getPrice();
 	}
 
 }

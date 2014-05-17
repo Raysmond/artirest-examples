@@ -1,13 +1,12 @@
 package edu.fdu.raysmond.store.resource;
 
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Date;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -19,6 +18,7 @@ import javax.ws.rs.core.UriInfo;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.glassfish.jersey.server.mvc.Template;
 
 import edu.fdu.raysmond.store.entity.Order;
 import edu.fdu.raysmond.store.entity.OrderState;
@@ -44,26 +44,40 @@ public class ShipmentResource {
 	@Path("create_shipping")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createShipping() throws JSONException {
-		if (order.getState() != OrderState.Order_confirmed
-				|| shipment.getState() != ShipmentState.Waiting_for_ship_item) {
+		if (!((order.getState() == OrderState.Order_confirmed || order.getState() == OrderState.Manager_creating_shipping) && shipment
+				.getState() != ShipmentState.Waiting_for_ship_item)) {
 			return Response.status(403).entity(Util.wrongState()).build();
 		}
 		JSONObject json = new JSONObject();
 		JSONObject orderInfo = new JSONObject().put("order_id", order.getId())
 				.put("customer_name", order.getCustomerName()).put("address", order.getCustomerAddress());
 		json.put("order", orderInfo);
-		json.put("optional_input", JSONUtil.createInputs("customer_name","address"));
+		json.put("optional_input", JSONUtil.createInputs("customer_name", "address"));
 		return Response.ok().entity(json).build();
 	}
 
-	@POST
+	@GET
+	@Path("create_shipping")
+	@Template(name = "manager_create_shipping.jsp")
+	@Produces(MediaType.TEXT_HTML)
+	public Shipment getShippingHtml() {
+		if (!((order.getState() == OrderState.Order_confirmed || order.getState() == OrderState.Manager_creating_shipping) && shipment
+				.getState() != ShipmentState.Waiting_for_ship_item)) {
+			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+		}
+		order.setState(OrderState.Manager_creating_shipping);
+		HibernateUtil.save(order);
+		return shipment;
+	}
+
+	@PUT
 	@Path("create_shipping")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createShipping(final JSONObject input) throws JSONException, URISyntaxException {
-		if (order.getState() != OrderState.Order_confirmed
-				|| shipment.getState() != ShipmentState.Waiting_for_ship_item) {
-			return Response.status(403).entity(Util.wrongState()).build();
+		if (!((order.getState() == OrderState.Order_confirmed || order.getState() == OrderState.Manager_creating_shipping) && shipment
+				.getState() != ShipmentState.Waiting_for_ship_item)) {
+			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
 		}
 		if (input.has("customer_name") && !input.getString("customer_name").equals(""))
 			shipment.setCustomerName(input.getString("customer_name"));
@@ -76,8 +90,9 @@ public class ShipmentResource {
 		order.setState(OrderState.Ready_for_shipping);
 		HibernateUtil.save(order);
 
-		String uri = uriInfo.getBaseUri().toString() + "order/" + order.getId() + "/shipment/" + shipment.getId();
-		return Response.created(new URI(uri)).entity(JSONUtil.SUCCESS).build();
+		// String uri = uriInfo.getBaseUri().toString() + "order/" +
+		// order.getId() + "/shipment/" + shipment.getId();
+		return Response.ok().entity(JSONUtil.SUCCESS).build();
 
 	}
 
@@ -96,10 +111,21 @@ public class ShipmentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response inShipping() throws JSONException {
 		if (shipment.getState() != ShipmentState.Ready_for_shipping) {
-			return Response.status(403).entity(Util.wrongState()).build();
+			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
 		}
 		JSONObject input = new JSONObject().put("input", new JSONArray().put("confirm"));
 		return Response.ok().entity(input).build();
+	}
+
+	@GET
+	@Path("in_shipping")
+	@Template(name = "in_shipping_confirm.jsp")
+	@Produces(MediaType.TEXT_HTML)
+	public Shipment inShippingHtml() {
+		if (shipment.getState() != ShipmentState.Ready_for_shipping) {
+			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+		}
+		return shipment;
 	}
 
 	@PUT
@@ -127,7 +153,7 @@ public class ShipmentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response shipped() throws JSONException {
 		if (order.getState() != OrderState.In_shipping) {
-			return Response.status(403).entity(JSONUtil.resultFail().put("reason", "The order is\'n shipping.")).build();
+			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
 		}
 		JSONObject json = new JSONObject();
 
@@ -141,6 +167,17 @@ public class ShipmentResource {
 		json.put("input", input);
 		json.put("output", output);
 		return Response.ok().entity(json).build();
+	}
+
+	@GET
+	@Path("shipped")
+	@Template(name = "shipped_confirm.jsp")
+	@Produces(MediaType.TEXT_HTML)
+	public Shipment shippedHtml() {
+		if (shipment.getState() != ShipmentState.In_shipping) {
+			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+		}
+		return shipment;
 	}
 
 	@PUT

@@ -5,6 +5,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.codehaus.jettison.json.JSONObject;
+
 @MappedSuperclass
 public abstract class BaseModel implements IBaseModel, Comparable<IBaseModel> {
 
@@ -31,12 +34,11 @@ public abstract class BaseModel implements IBaseModel, Comparable<IBaseModel> {
 			return false;
 		return this.getId() == ((IBaseModel) other).getId();
 	}
-	
-	/**
-	 * use HashCodeBuilder to calculate a hashcode
-	 */
-	// public int hashCode() {
-	// return new HashCodeBuilder().append(getId()).toHashCode();
-	// }
+
+	public int hashCode() {
+		final int PRIME = 31;
+		return new HashCodeBuilder(getId() % 2 == 0 ? getId() + 1 : getId(), PRIME).toHashCode();
+
+	}
 
 }
