@@ -1,6 +1,5 @@
 package edu.fdu.raysmond.store.resource;
 
-import javax.annotation.security.RolesAllowed;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.Consumes;
@@ -13,15 +12,14 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 
-import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.glassfish.jersey.server.mvc.Template;
 
 import edu.fdu.raysmond.store.controller.UserController;
 import edu.fdu.raysmond.store.entity.User;
-import edu.fdu.raysmond.store.entity.UserRole;
 import edu.fdu.raysmond.store.util.Encryption;
+import edu.fdu.raysmond.store.util.JSONUtil;
 
 /**
  * @author Raysmond
@@ -37,12 +35,9 @@ public class UserResource {
 	 */
 	@GET
 	@Path("login")
-	@RolesAllowed(UserRole.CUSTOMER)
 	@Produces(MediaType.APPLICATION_JSON)
 	public JSONObject login() throws JSONException {
-		JSONObject username = new JSONObject().put("field", "user_name").put("type", "text");
-		JSONObject password = new JSONObject().put("field", "password").put("type", "password");
-		return new JSONObject().put("input", new JSONArray().put(username).put(password));
+		return new JSONObject().put("input", JSONUtil.createInputs("user_name", "password"));
 	}
 
 	/**

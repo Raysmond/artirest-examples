@@ -25,6 +25,7 @@ import edu.fdu.raysmond.store.entity.OrderState;
 import edu.fdu.raysmond.store.entity.Shipment;
 import edu.fdu.raysmond.store.entity.ShipmentState;
 import edu.fdu.raysmond.store.util.HibernateUtil;
+import edu.fdu.raysmond.store.util.JSONUtil;
 import edu.fdu.raysmond.store.util.Util;
 
 public class ShipmentResource {
@@ -51,7 +52,7 @@ public class ShipmentResource {
 		JSONObject orderInfo = new JSONObject().put("order_id", order.getId())
 				.put("customer_name", order.getCustomerName()).put("address", order.getCustomerAddress());
 		json.put("order", orderInfo);
-		json.put("optional_input", new JSONArray().put("customer_name").put("address"));
+		json.put("optional_input", JSONUtil.createInputs("customer_name","address"));
 		return Response.ok().entity(json).build();
 	}
 
@@ -75,10 +76,8 @@ public class ShipmentResource {
 		order.setState(OrderState.Ready_for_shipping);
 		HibernateUtil.save(order);
 
-		return Response
-				.created(
-						new URI(uriInfo.getBaseUri().toString() + "order/" + order.getId() + "/shipment/"
-								+ shipment.getId())).entity(Util.SUCCESS).build();
+		String uri = uriInfo.getBaseUri().toString() + "order/" + order.getId() + "/shipment/" + shipment.getId();
+		return Response.created(new URI(uri)).entity(JSONUtil.SUCCESS).build();
 
 	}
 
@@ -118,9 +117,9 @@ public class ShipmentResource {
 
 			order.setState(OrderState.In_shipping);
 			HibernateUtil.save(order);
-			return Response.ok().entity(Util.SUCCESS).build();
+			return Response.ok().entity(JSONUtil.SUCCESS).build();
 		}
-		return Response.ok().entity(Util.FAIL).build();
+		return Response.ok().entity(JSONUtil.FAILURE).build();
 	}
 
 	@GET
@@ -128,7 +127,7 @@ public class ShipmentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response shipped() throws JSONException {
 		if (order.getState() != OrderState.In_shipping) {
-			return Response.status(403).entity(new JSONObject().put("reason", "The order is\'n shipping.")).build();
+			return Response.status(403).entity(JSONUtil.resultFail().put("reason", "The order is\'n shipping.")).build();
 		}
 		JSONObject json = new JSONObject();
 
@@ -159,9 +158,9 @@ public class ShipmentResource {
 
 			order.setState(OrderState.Shipped);
 			HibernateUtil.save(order);
-			return Response.ok().entity(Util.SUCCESS).build();
+			return Response.ok().entity(JSONUtil.SUCCESS).build();
 		}
-		return Response.ok().entity(Util.FAIL).build();
+		return Response.ok().entity(JSONUtil.FAILURE).build();
 	}
 
 }

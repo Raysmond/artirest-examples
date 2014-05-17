@@ -21,14 +21,14 @@ import edu.fdu.raysmond.store.util.BaseModel;
 public class Shipment extends BaseModel {
 	private int orderId;
 	private String customerName;
-	private String ShippingAddress;
-	
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date ShipStartDate;
+	private String shippingAddress;
 
 	@Temporal(TemporalType.TIMESTAMP)
-	private Date ShipEndDate;
-	
+	private Date shipStartDate;
+
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date shipEndDate;
+
 	@Enumerated(EnumType.STRING)
 	private ShipmentState state;
 
@@ -49,27 +49,27 @@ public class Shipment extends BaseModel {
 	}
 
 	public String getShippingAddress() {
-		return ShippingAddress;
+		return shippingAddress;
 	}
 
 	public void setShippingAddress(String shippingAddress) {
-		ShippingAddress = shippingAddress;
+		this.shippingAddress = shippingAddress;
 	}
 
 	public Date getShipStartDate() {
-		return ShipStartDate;
+		return shipStartDate;
 	}
 
 	public void setShipStartDate(Date shipStartDate) {
-		ShipStartDate = shipStartDate;
+		this.shipStartDate = shipStartDate;
 	}
 
 	public Date getShipEndDate() {
-		return ShipEndDate;
+		return shipEndDate;
 	}
 
 	public void setShipEndDate(Date shipEndDate) {
-		ShipEndDate = shipEndDate;
+		this.shipEndDate = shipEndDate;
 	}
 
 	public ShipmentState getState() {

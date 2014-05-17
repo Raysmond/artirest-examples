@@ -17,7 +17,7 @@ value=
 <script src="<c:url value="/js/jquery.js"/>"></script>
 <!-- Include all compiled plugins (below), or include individual files as needed -->
 <script src="<c:url value="/js/bootstrap.min.js"/>"></script>
-<title>RESTful Loan Process Manangement</title>
+<title>RESTful store BPM</title>
 </head>
 <body>
 	<!-- Fixed navbar -->
@@ -30,7 +30,7 @@ value=
 						class="icon-bar"></span> <span class="icon-bar"></span> <span
 						class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="/rest-loan/">RESTful Loan BPM</a>
+				<a class="navbar-brand" href="/rest-store/">RESTful store BPM</a>
 			</div>
 			<div class="navbar-collapse collapse">
 				<%
@@ -39,16 +39,16 @@ value=
 				%>
 				<ul id="main-nav" class="nav navbar-nav">
 					<c:if test="<%=(isAdmin == false)%>">
-						<li><a href="/rest-loan/user/login">Manager Login</a></li>
+						<li><a href="/rest-store/user/login">Manager Login</a></li>
 					</c:if>
-					<li><a href="/rest-loan/loan/create">Apply</a></li>
+					<li><a href="/rest-store/item/list">Items</a></li>
 					<c:if test="<%=isAdmin%>">
-						<li><a href="/rest-loan/loan/list">Administration</a></li>
+						<li><a href="/rest-store/order/list">Administration</a></li>
 					</c:if>
-					<li><a href="/rest-loan/jsp/about.jsp">About</a></li>
+					<li><a href="/rest-store/jsp/about.jsp">About</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li><a href="https://github.com/Raysmond/loan" target="_blank">Github
+					<li><a href="https://github.com/Raysmond/artirest-examples" target="_blank">Github
 							Repo</a></li>
 				</ul>
 			</div>

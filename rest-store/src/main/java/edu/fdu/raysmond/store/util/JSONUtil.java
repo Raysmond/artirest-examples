@@ -1,5 +1,6 @@
 package edu.fdu.raysmond.store.util;
 
+import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
@@ -7,18 +8,31 @@ public class JSONUtil {
 	public static final String SUCCESS_TEXT = "success";
 	public static final String FAIL_TEXT = "fail";
 
+	public static final JSONObject SUCCESS = resultSuccess();
+	public static final JSONObject FAILURE = resultFail();
+
 	/**
 	 * Return a success JSON
 	 */
-	public static JSONObject resultJson() throws JSONException {
-		return new JSONObject().put("result", SUCCESS_TEXT);
+	public static JSONObject resultSuccess() {
+		try {
+			return new JSONObject().put("result", SUCCESS_TEXT);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
 	 * Return a fail JSON
 	 */
-	public static JSONObject resultFail() throws JSONException {
-		return new JSONObject().put("result", FAIL_TEXT);
+	public static JSONObject resultFail() {
+		try {
+			return new JSONObject().put("result", FAIL_TEXT);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	/**
@@ -45,6 +59,14 @@ public class JSONUtil {
 		}
 
 		return true;
+	}
+
+	public static JSONArray createInputs(String... fields) {
+		JSONArray arr = new JSONArray();
+		for (String field : fields) {
+			arr.put(field);
+		}
+		return arr;
 	}
 
 }

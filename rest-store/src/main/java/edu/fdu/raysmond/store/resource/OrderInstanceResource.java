@@ -5,8 +5,8 @@ import java.util.Date;
 import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -20,6 +20,7 @@ import javax.ws.rs.core.UriInfo;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.glassfish.jersey.server.mvc.Template;
 
 import edu.fdu.raysmond.store.controller.OrderController;
 import edu.fdu.raysmond.store.entity.Invoice;
@@ -57,7 +58,8 @@ public class OrderInstanceResource {
 	 * View order details
 	 */
 	@GET
-	@Produces(MediaType.APPLICATION_JSON)
+	@Template(name = "order.jsp")
+	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_HTML })
 	public Order get() {
 		return order;
 	}
@@ -80,6 +82,7 @@ public class OrderInstanceResource {
 	@PUT
 	@Path("add_item")
 	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
 	public Response addItem(final JSONObject input) throws JSONException {
 		if (order.getState() != OrderState.Adding_order_item) {
 			return Response.status(403).entity(Util.wrongState()).build();
@@ -111,7 +114,7 @@ public class OrderInstanceResource {
 		item.setId(id);
 		boolean result = order.getItems().remove(item);
 		HibernateUtil.save(order);
-		return Response.ok().entity(result ? Util.SUCCESS : Util.FAIL).build();
+		return Response.ok().entity(result ? JSONUtil.SUCCESS : JSONUtil.FAILURE).build();
 	}
 
 	@PUT
@@ -121,9 +124,9 @@ public class OrderInstanceResource {
 		if (order.getState() == OrderState.Adding_order_item && !order.getItems().isEmpty()) {
 			order.setState(OrderState.Customer_creating_shipping);
 			HibernateUtil.save(order);
-			return Response.ok().entity(Util.SUCCESS).build();
+			return Response.ok().entity(JSONUtil.SUCCESS).build();
 		} else {
-			return Response.status(403).entity(Util.FAIL).build();
+			return Response.status(403).entity(JSONUtil.FAILURE).build();
 		}
 	}
 
@@ -140,6 +143,29 @@ public class OrderInstanceResource {
 		return Response.status(403).entity(Util.wrongState()).build();
 	}
 
+	@GET
+	@Path("create_shipping")
+	@Template(name = "create_shipping.jsp")
+	@Produces(MediaType.TEXT_HTML)
+	public Shipment getShippingHtml() {
+		if (order.getState() == OrderState.Customer_creating_shipping) {
+			if (shipment != null)
+				return shipment;
+			else {
+				shipment = new Shipment();
+				shipment.setCustomerName(order.getCustomerName());
+				shipment.setShippingAddress(order.getCustomerAddress() == null ? "" : order.getCustomerAddress());
+				shipment.setOrderId(order.getId());
+				shipment.setState(ShipmentState.Waiting_for_ship_item);
+				HibernateUtil.save(shipment);
+				return shipment;
+			}
+		} else {
+			throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).entity("Cannot create a shipment")
+					.build());
+		}
+	}
+
 	@PUT
 	@Path("create_shipping")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -148,25 +174,31 @@ public class OrderInstanceResource {
 		if (order.getState() != OrderState.Customer_creating_shipping) {
 			return Response.status(403).entity(Util.wrongState()).build();
 		}
-		if (JSONUtil.notEmptyStrings(input, "customer_name", "address")) {
+		if (JSONUtil.notEmptyStrings(input, "customer_name", "customer_address")) {
 			if (null == shipment)
 				shipment = new Shipment();
 			shipment.setCustomerName(input.getString("customer_name"));
-			shipment.setShippingAddress(input.getString("address"));
+			shipment.setShippingAddress(input.getString("customer_address"));
 			shipment.setOrderId(order.getId());
 			shipment.setState(ShipmentState.Waiting_for_ship_item);
 			HibernateUtil.save(shipment);
 
-			// create an invoice
-			Invoice invoice = new Invoice();
-			invoice.setOrderId(order.getId());
-			invoice.setTotal(order.getTotal());
-			invoice.setState(InvoiceState.unpaied);
-			HibernateUtil.save(invoice);
+			order.setCustomerName(input.getString("customer_name"));
+			order.setCustomerAddress(input.getString("customer_address"));
+			HibernateUtil.save(order);
 
-			return Response.ok().entity(Util.SUCCESS).build();
+			// create an invoice
+			if (invoice == null) {
+				invoice = new Invoice();
+				invoice.setOrderId(order.getId());
+				invoice.setTotal(order.getTotal());
+				invoice.setState(InvoiceState.unpaied);
+				HibernateUtil.save(invoice);
+			}
+
+			return Response.ok().entity(JSONUtil.SUCCESS).build();
 		}
-		return Response.ok().entity(Util.FAIL).build();
+		return Response.ok().entity(JSONUtil.FAILURE).build();
 	}
 
 	// Customer - bill
@@ -192,6 +224,18 @@ public class OrderInstanceResource {
 		return Response.ok().entity(result).build();
 	}
 
+	@GET
+	@Template(name = "bill.jsp")
+	@Path("bill")
+	@Produces(MediaType.TEXT_HTML)
+	public Order getBillHtml() throws JSONException {
+		if (order.getState() == OrderState.Customer_creating_shipping) {
+			return order;
+		} else {
+			throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).entity("Wrong order state").build());
+		}
+	}
+
 	@PUT
 	@Path("bill")
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -202,7 +246,7 @@ public class OrderInstanceResource {
 		}
 
 		if (shipment == null) {
-			JSONObject result = new JSONObject().put("result", "fail").put("reason", "Must create a shipment first");
+			JSONObject result = JSONUtil.resultFail().put("reason", "Must create a shipment first");
 			return Response.status(403).entity(result).build();
 		}
 
@@ -221,25 +265,37 @@ public class OrderInstanceResource {
 				invoice.setBillingAddress(order.getCustomerAddress());
 				HibernateUtil.save(invoice);
 
-				return Response.ok().entity(Util.SUCCESS).build();
+				return Response.ok().entity(JSONUtil.SUCCESS).build();
 			}
 			// if (op.equalsIgnoreCase("no")) {}
 		}
-		return Response.ok().entity(Util.FAIL).build();
+		return Response.ok().entity(JSONUtil.FAILURE).build();
 	}
 
 	// Manager - process/confirm item
-	// @RolesAllowed(UserRole.MANAGER)
+
 	@GET
+	@RolesAllowed(UserRole.MANAGER)
 	@Path("confirm")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getProcessItem() throws JSONException {
 		if (order.getState() != OrderState.Billed) {
 			return Response.status(403).entity(Util.wrongState()).build();
 		}
-
 		JSONObject json = new JSONObject().put("output", new JSONArray().put("confirm"));
 		return Response.ok().entity(json).build();
+	}
+
+	@GET
+	@RolesAllowed(UserRole.MANAGER)
+	@Template(name = "confirm.jsp")
+	@Path("confirm")
+	@Produces(MediaType.TEXT_HTML)
+	public Order getProcessHtml() throws JSONException {
+		if (order.getState() != OrderState.Billed) {
+			throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).entity("Wrong order state").build());
+		}
+		return order;
 	}
 
 	/**
@@ -247,6 +303,7 @@ public class OrderInstanceResource {
 	 * corresponding stuff actually
 	 */
 	@PUT
+	@RolesAllowed(UserRole.MANAGER)
 	@Path("confirm")
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -261,16 +318,16 @@ public class OrderInstanceResource {
 
 				shipment.setState(ShipmentState.Ready_for_shipping);
 				HibernateUtil.save(shipment);
-				return Response.ok().entity(Util.SUCCESS).build();
+				return Response.ok().entity(JSONUtil.SUCCESS).build();
 			}
 		}
-		return Response.ok().entity(Util.FAIL).build();
+		return Response.ok().entity(JSONUtil.FAILURE).build();
 	}
 
 	/**
 	 * Manager - shipment management
 	 */
-	// @RolesAllowed(UserRole.MANAGER)
+	@RolesAllowed(UserRole.MANAGER)
 	@Path("shipment")
 	public ShipmentResource shipment() {
 		return new ShipmentResource(order, shipment);

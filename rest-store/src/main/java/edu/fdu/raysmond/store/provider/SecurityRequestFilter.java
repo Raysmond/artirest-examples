@@ -41,6 +41,8 @@ public class SecurityRequestFilter implements ContainerRequestFilter {
 			@Override
 			public boolean isUserInRole(final String role) {
 				String r = (String) session.getAttribute("USER_ROLE");
+				if (r != null && r.equals(UserRole.MANAGER))
+					return true;
 				return role.equals((r == null ? UserRole.CUSTOMER : r));
 			}
 
