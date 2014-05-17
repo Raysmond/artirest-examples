@@ -6,7 +6,6 @@ import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.codehaus.jettison.json.JSONObject;
 
 @MappedSuperclass
 public abstract class BaseModel implements IBaseModel, Comparable<IBaseModel> {

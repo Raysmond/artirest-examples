@@ -26,7 +26,6 @@ import edu.fdu.raysmond.store.entity.Shipment;
 import edu.fdu.raysmond.store.entity.ShipmentState;
 import edu.fdu.raysmond.store.util.HibernateUtil;
 import edu.fdu.raysmond.store.util.JSONUtil;
-import edu.fdu.raysmond.store.util.Util;
 
 public class ShipmentResource {
 	@Context
@@ -46,7 +45,7 @@ public class ShipmentResource {
 	public Response createShipping() throws JSONException {
 		if (!((order.getState() == OrderState.Order_confirmed || order.getState() == OrderState.Manager_creating_shipping) && shipment
 				.getState() != ShipmentState.Waiting_for_ship_item)) {
-			return Response.status(403).entity(Util.wrongState()).build();
+			return Response.status(403).entity(JSONUtil.WRONG_STATE).build();
 		}
 		JSONObject json = new JSONObject();
 		JSONObject orderInfo = new JSONObject().put("order_id", order.getId())
@@ -63,7 +62,7 @@ public class ShipmentResource {
 	public Shipment getShippingHtml() {
 		if (!((order.getState() == OrderState.Order_confirmed || order.getState() == OrderState.Manager_creating_shipping) && shipment
 				.getState() != ShipmentState.Waiting_for_ship_item)) {
-			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+			throw new ForbiddenException(Response.status(403).entity(JSONUtil.WRONG_STATE).build());
 		}
 		order.setState(OrderState.Manager_creating_shipping);
 		HibernateUtil.save(order);
@@ -77,7 +76,7 @@ public class ShipmentResource {
 	public Response createShipping(final JSONObject input) throws JSONException, URISyntaxException {
 		if (!((order.getState() == OrderState.Order_confirmed || order.getState() == OrderState.Manager_creating_shipping) && shipment
 				.getState() != ShipmentState.Waiting_for_ship_item)) {
-			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+			throw new ForbiddenException(Response.status(403).entity(JSONUtil.WRONG_STATE).build());
 		}
 		if (input.has("customer_name") && !input.getString("customer_name").equals(""))
 			shipment.setCustomerName(input.getString("customer_name"));
@@ -111,7 +110,7 @@ public class ShipmentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response inShipping() throws JSONException {
 		if (shipment.getState() != ShipmentState.Ready_for_shipping) {
-			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+			throw new ForbiddenException(Response.status(403).entity(JSONUtil.WRONG_STATE).build());
 		}
 		JSONObject input = new JSONObject().put("input", new JSONArray().put("confirm"));
 		return Response.ok().entity(input).build();
@@ -123,7 +122,7 @@ public class ShipmentResource {
 	@Produces(MediaType.TEXT_HTML)
 	public Shipment inShippingHtml() {
 		if (shipment.getState() != ShipmentState.Ready_for_shipping) {
-			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+			throw new ForbiddenException(Response.status(403).entity(JSONUtil.WRONG_STATE).build());
 		}
 		return shipment;
 	}
@@ -134,7 +133,7 @@ public class ShipmentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response inShipping(final JSONObject input) throws JSONException {
 		if (shipment.getState() != ShipmentState.Ready_for_shipping) {
-			return Response.status(403).entity(Util.wrongState()).build();
+			return Response.status(403).entity(JSONUtil.WRONG_STATE).build();
 		}
 		if (input.has("confirm") && input.getString("confirm").equals("yes")) {
 			shipment.setState(ShipmentState.In_shipping);
@@ -153,7 +152,7 @@ public class ShipmentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response shipped() throws JSONException {
 		if (order.getState() != OrderState.In_shipping) {
-			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+			throw new ForbiddenException(Response.status(403).entity(JSONUtil.WRONG_STATE).build());
 		}
 		JSONObject json = new JSONObject();
 
@@ -175,7 +174,7 @@ public class ShipmentResource {
 	@Produces(MediaType.TEXT_HTML)
 	public Shipment shippedHtml() {
 		if (shipment.getState() != ShipmentState.In_shipping) {
-			throw new ForbiddenException(Response.status(403).entity(Util.wrongState()).build());
+			throw new ForbiddenException(Response.status(403).entity(JSONUtil.WRONG_STATE).build());
 		}
 		return shipment;
 	}
@@ -186,7 +185,7 @@ public class ShipmentResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response shipped(final JSONObject input) throws JSONException {
 		if (shipment.getState() != ShipmentState.In_shipping && order.getState() != OrderState.In_shipping) {
-			return Response.status(403).entity(Util.wrongState()).build();
+			return Response.status(403).entity(JSONUtil.WRONG_STATE).build();
 		}
 		if (input.has("confirm") && input.getString("confirm").equals("yes")) {
 			shipment.setState(ShipmentState.Shipping_completed);

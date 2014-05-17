@@ -39,17 +39,17 @@
 						<td>${i.state}</td>
 						<td><a href="/rest-store/order/${i.id}" class="btn btn-success btn-xs">View</a> <c:choose>
 								<c:when test="${i.state=='Billed'}">
-									<a href="javascript:confirmOrder('/rest-store/order/${i.id}/confirm')" class="btn btn-success btn-xs">Confirm</a>
+									<a href="/rest-store/order/${i.id}/confirm" class="btn btn-success btn-xs">Confirm</a>
 								</c:when>
 								<c:when test="${i.state=='Order_confirmed'}">
-									<a href="/rest-store/order/${i.id}/shipment/create_shipping" class="btn btn-success btn-xs">Create Shipment</a>
+									<a href="/rest-store/order/${i.id}/shipment/create_shipping" class="btn btn-success btn-xs">Shipment</a>
 								</c:when>
 								<c:when test="${i.state=='Manager_creating_shipping'}">
 									<a href="/rest-store/order/${i.id}/shipment/create_shipping" class="btn btn-success btn-xs">Shipment</a>
 								</c:when>
 								
 								<c:when test="${i.state=='Ready_for_shipping'}">
-									<a href="/rest-store/order/${i.id}/shipment/in_shipping" class="btn btn-success btn-xs">Set in shipping</a>
+									<a href="/rest-store/order/${i.id}/shipment/in_shipping" class="btn btn-success btn-xs">In shipping</a>
 								</c:when>
 								
 								<c:when test="${i.state=='In_shipping'}">

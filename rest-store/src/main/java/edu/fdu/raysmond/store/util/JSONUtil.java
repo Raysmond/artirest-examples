@@ -10,6 +10,7 @@ public class JSONUtil {
 
 	public static final JSONObject SUCCESS = resultSuccess();
 	public static final JSONObject FAILURE = resultFail();
+	public static final JSONObject WRONG_STATE = wrongState();
 
 	/**
 	 * Return a success JSON
@@ -29,6 +30,18 @@ public class JSONUtil {
 	public static JSONObject resultFail() {
 		try {
 			return new JSONObject().put("result", FAIL_TEXT);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	/**
+	 * Return a wrong state result
+	 */
+	public static JSONObject wrongState(){
+		try {
+			return new JSONObject().put("result", "fail").put("reason", "Wrong state.");
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}

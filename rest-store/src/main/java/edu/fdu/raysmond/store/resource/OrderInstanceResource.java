@@ -23,6 +23,7 @@ import org.codehaus.jettison.json.JSONObject;
 import org.glassfish.jersey.server.mvc.Template;
 
 import edu.fdu.raysmond.store.controller.OrderController;
+import edu.fdu.raysmond.store.controller.ProcessStateController;
 import edu.fdu.raysmond.store.entity.Invoice;
 import edu.fdu.raysmond.store.entity.InvoiceState;
 import edu.fdu.raysmond.store.entity.Item;
@@ -94,6 +95,7 @@ public class OrderInstanceResource {
 			}
 			order.addItem(item);
 			HibernateUtil.save(order);
+			
 			result.put("result", true);
 		} else {
 			result.put("result", false).put("reason", "An item is required");
