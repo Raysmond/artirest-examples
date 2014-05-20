@@ -29,9 +29,16 @@ public class ItemResource {
 
 	@GET
 	@Path("list")
-	@Template(name = "list.jsp")
-	@Produces({ MediaType.TEXT_HTML, MediaType.APPLICATION_JSON })
+	@Produces(MediaType.APPLICATION_JSON)
 	public Collection<Item> getAll() {
+		return HibernateUtil.all(Item.class);
+	}
+
+	@GET
+	@Path("list")
+	@Template(name = "list.jsp")
+	@Produces(MediaType.TEXT_HTML)
+	public Collection<Item> getAllHTML() {
 		return HibernateUtil.all(Item.class);
 	}
 

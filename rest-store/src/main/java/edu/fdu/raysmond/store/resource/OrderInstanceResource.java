@@ -23,7 +23,6 @@ import org.codehaus.jettison.json.JSONObject;
 import org.glassfish.jersey.server.mvc.Template;
 
 import edu.fdu.raysmond.store.controller.OrderController;
-import edu.fdu.raysmond.store.controller.ProcessStateController;
 import edu.fdu.raysmond.store.entity.Invoice;
 import edu.fdu.raysmond.store.entity.InvoiceState;
 import edu.fdu.raysmond.store.entity.Item;
@@ -59,9 +58,15 @@ public class OrderInstanceResource {
 	 * View order details
 	 */
 	@GET
-	@Template(name = "order.jsp")
-	@Produces({ MediaType.APPLICATION_JSON, MediaType.TEXT_HTML })
+	@Produces(MediaType.APPLICATION_JSON)
 	public Order get() {
+		return order;
+	}
+
+	@GET
+	@Template(name = "order.jsp")
+	@Produces(MediaType.TEXT_HTML)
+	public Order getHTML() {
 		return order;
 	}
 
@@ -95,7 +100,7 @@ public class OrderInstanceResource {
 			}
 			order.addItem(item);
 			HibernateUtil.save(order);
-			
+
 			result.put("result", true);
 		} else {
 			result.put("result", false).put("reason", "An item is required");
@@ -139,7 +144,7 @@ public class OrderInstanceResource {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getShippingFields() throws JSONException {
 		if (order.getState() == OrderState.Customer_creating_shipping) {
-			JSONObject json = new JSONObject().put("input", new JSONArray().put("customer_name").put("address"));
+			JSONObject json = new JSONObject().put("input", new JSONArray().put("customer_name").put("customer_address"));
 			return Response.ok().entity(json).build();
 		}
 		return Response.status(403).entity(Util.wrongState()).build();
