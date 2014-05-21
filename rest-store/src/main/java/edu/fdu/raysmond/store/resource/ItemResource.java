@@ -27,6 +27,9 @@ public class ItemResource {
 	@Context
 	UriInfo uri;
 
+	/**
+	 * View item list in JSON
+	 */
 	@GET
 	@Path("list")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -34,6 +37,9 @@ public class ItemResource {
 		return HibernateUtil.all(Item.class);
 	}
 
+	/**
+	 * View item list in HTML
+	 */
 	@GET
 	@Path("list")
 	@Template(name = "list.jsp")
@@ -41,13 +47,16 @@ public class ItemResource {
 	public Collection<Item> getAllHTML() {
 		return HibernateUtil.all(Item.class);
 	}
-
+	
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JSONObject get() throws JSONException {
 		return new JSONObject().put("item_fields", JSONUtil.createInputs("name", "price"));
 	}
-
+	
+	/**
+	 * Create a new item
+	 */
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON })
 	public Response post(final JSONObject input) throws JSONException, URISyntaxException {

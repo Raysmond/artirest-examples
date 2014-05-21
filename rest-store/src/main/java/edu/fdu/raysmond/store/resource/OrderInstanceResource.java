@@ -138,16 +138,16 @@ public class OrderInstanceResource {
 	}
 
 	// Customer - create shipment
-
 	@GET
 	@Path("create_shipping")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getShippingFields() throws JSONException {
 		if (order.getState() == OrderState.Customer_creating_shipping) {
-			JSONObject json = new JSONObject().put("input", new JSONArray().put("customer_name").put("customer_address"));
+			JSONObject json = new JSONObject().put("input", new JSONArray().put("customer_name")
+					.put("customer_address"));
 			return Response.ok().entity(json).build();
 		}
-		return Response.status(403).entity(Util.wrongState()).build();
+		return Response.status(403).entity(JSONUtil.WRONG_STATE).build();
 	}
 
 	@GET
@@ -156,20 +156,17 @@ public class OrderInstanceResource {
 	@Produces(MediaType.TEXT_HTML)
 	public Shipment getShippingHtml() {
 		if (order.getState() == OrderState.Customer_creating_shipping) {
-			if (shipment != null)
-				return shipment;
-			else {
+			if (shipment == null) {
 				shipment = new Shipment();
 				shipment.setCustomerName(order.getCustomerName());
 				shipment.setShippingAddress(order.getCustomerAddress() == null ? "" : order.getCustomerAddress());
 				shipment.setOrderId(order.getId());
 				shipment.setState(ShipmentState.Waiting_for_ship_item);
 				HibernateUtil.save(shipment);
-				return shipment;
 			}
+			return shipment;
 		} else {
-			throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).entity("Cannot create a shipment")
-					.build());
+			throw new ForbiddenException(Response.status(403).entity(JSONUtil.WRONG_STATE).build());
 		}
 	}
 
