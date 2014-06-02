@@ -46,7 +46,8 @@ public class OrderResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JSONObject get() throws JSONException {
-		return new JSONObject().put("inputs", new JSONArray().put("customer_name"));
+		return new JSONObject().put("inputs", 
+				new JSONArray().put("customer_name"));
 	}
 
 	@GET

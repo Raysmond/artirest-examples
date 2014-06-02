@@ -32,12 +32,12 @@ public class LoanInstanceResource {
 	int loanId;
 	Loan loan;
 
-	@Context
 	private SecurityContext security;
 
-	public LoanInstanceResource(UriInfo uri, int loanId) {
+	public LoanInstanceResource(UriInfo uri, SecurityContext security, int loanId) {
 		this.uri = uri;
 		this.loanId = loanId;
+		this.security = security;
 		loan = LoanController.get(loanId);
 	}
 
@@ -57,16 +57,18 @@ public class LoanInstanceResource {
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public JSONObject getLoanJSON() throws JSONException {
-		JSONObject json = new JSONObject().put("loan", loan);
-		String url = uri.getBaseUri().toString() + "/loan/" + loanId;
+		JSONObject json = new JSONObject().put("loan", loan.toJson());
+		String url = uri.getBaseUri().toString() + "loan/" + loanId;
 
 		// 'apply' link
 		if (loan.getState() == LoanState.CREATED)
 			json.put("link", url + "/apply");
 
-		// 'confirm' link
-		if (security.isUserInRole(UserRole.MANAGER) && loan.getState() == LoanState.APPLIED)
+		if (security == null) {
+			json.put("security", "null");
+		} else if (security.isUserInRole(UserRole.MANAGER) && loan.getState() == LoanState.APPLIED) {
 			json.put("link", url + "/approve");
+		}
 
 		return json;
 	}
@@ -88,7 +90,7 @@ public class LoanInstanceResource {
 			for (String bank : BankController.controller().getAll()) {
 				banks.put(bank);
 			}
-			
+
 			JSONObject result = new JSONObject().put("state", "active");
 			JSONObject input = new JSONObject().put("options", banks);
 			result.put("input", input);
@@ -135,7 +137,7 @@ public class LoanInstanceResource {
 	@Path("approve")
 	public JSONObject approve() throws JSONException {
 		if (loan.getState() == LoanState.APPLIED) {
-			return new JSONObject().put("state", "active").put("input", loan)
+			return new JSONObject().put("state", "active").put("input", loan.toJson())
 					.put("output", new JSONArray().put("approve"));
 		}
 		return null;

@@ -16,7 +16,7 @@
 			<div class="col-sm-3">Amount</div>
 			<div class="col-sm-9">${it.amount}</div>
 			<div class="col-sm-3">Status</div>
-			<div class="col-sm-9">${it.state}</div>
+			<div class="col-sm-9"><span class="label label-info">${it.state}</span></div>
 			<div class="col-sm-3">Created time</div>
 			<div class="col-sm-9">
 				<fmt:formatDate value="${it.created}" pattern="yyyy-MM-dd HH:mm:ss" />

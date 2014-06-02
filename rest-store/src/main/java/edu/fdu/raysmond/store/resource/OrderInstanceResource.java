@@ -239,7 +239,7 @@ public class OrderInstanceResource {
 		if (order.getState() == OrderState.Customer_creating_shipping) {
 			return order;
 		} else {
-			throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).entity("Wrong order state").build());
+			throw new ForbiddenException(Response.status(403).entity("Wrong order state").build());
 		}
 	}
 
@@ -300,7 +300,7 @@ public class OrderInstanceResource {
 	@Produces(MediaType.TEXT_HTML)
 	public Order getProcessHtml() throws JSONException {
 		if (order.getState() != OrderState.Billed) {
-			throw new ForbiddenException(Response.status(Response.Status.FORBIDDEN).entity("Wrong order state").build());
+			throw new ForbiddenException(Response.status(403).entity("Wrong order state").build());
 		}
 		return order;
 	}

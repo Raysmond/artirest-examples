@@ -46,8 +46,9 @@ public class LoanResource {
 	private static final String inputs[] = { "customer_name", "amount" };
 
 	@GET
-	public Response get() {
-		return Response.ok().entity("To apply a new loan, please goto URI: " + uri("loan/create")).build();
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response get() throws JSONException {
+		return Response.ok().entity(new JSONObject().put("uri", uri("loan/create").toString())).build();
 	}
 
 	@GET
@@ -114,7 +115,7 @@ public class LoanResource {
 			throw new NotFoundException(Response.status(Response.Status.NOT_FOUND)
 					.entity("Loan instance, " + id + ", is not found").build());
 		}
-		return new LoanInstanceResource(uriInfo, id);
+		return new LoanInstanceResource(uriInfo, security, id);
 	}
 
 	private String uri(String path) {

@@ -1,5 +1,5 @@
 <%@page
-	import="edu.fdu.raysmond.store.controller.*, java.util.*,edu.fdu.raysmond.store.entity.*"%>
+	import="edu.fdu.raysmond.loan.controller.*, java.util.*,edu.fdu.raysmond.loan.entity.*"%>
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>

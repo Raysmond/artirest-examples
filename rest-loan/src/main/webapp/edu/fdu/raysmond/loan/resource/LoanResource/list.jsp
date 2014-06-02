@@ -1,4 +1,4 @@
-<%@page import="edu.fdu.raysmond.store.entity.LoanState"%>
+<%@page import="edu.fdu.raysmond.loan.entity.LoanState"%>
 <%@page contentType="text/html"%>
 <%@page pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>

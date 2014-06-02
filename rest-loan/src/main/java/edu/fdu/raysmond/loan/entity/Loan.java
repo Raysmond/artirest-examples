@@ -86,4 +86,13 @@ public class Loan extends BaseModel {
 	public void setState(LoanState status) {
 		this.state = status;
 	}
+
+	public JSONObject toJson() throws JSONException {
+		JSONObject json = new JSONObject();
+		json.put("customerName", this.customerName).put("amount", this.amount).put("created", this.created)
+				.put("state", this.state);
+		if (this.bank != null)
+			json.put("bank", this.bank);
+		return json;
+	}
 }
