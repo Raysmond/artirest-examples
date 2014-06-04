@@ -94,7 +94,7 @@ public class OrderResource {
 				}
 			}
 		}
-		if (order == null)
+		if (order == null)	
 			order = new Order();
 		order.setState(OrderState.Adding_order_item);
 		order.setCustomerName(inputs.getString("customer_name"));

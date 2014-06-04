@@ -1,4 +1,4 @@
-package edu.fdu.raysmond.loan.provider;
+package edu.fdu.raysmond.store.provider;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;

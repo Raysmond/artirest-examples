@@ -7,7 +7,7 @@
 	    <h1>Apply a new loan</h1>
 	    <hr>
 	    <div class="row">
-	    	<div class="col-sm-6">
+	    	<div class="col-sm-12">
 	    		<form class="form-horizontal" role="form" method="post" action="/rest-loan/loan/create_post">
 				   <div class="form-group">
 				    <label for="customer_name" class="col-sm-3 control-label">Your Name</label>
@@ -28,7 +28,6 @@
 				  </div>
 				</form>
 	    	</div>
-	    	<div class="col-sm-6"></div>
 	    </div>
     </div>
 	

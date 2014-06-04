@@ -38,9 +38,6 @@ value=
 					boolean isAdmin = userRole != null && userRole.equals("manager");
 				%>
 				<ul id="main-nav" class="nav navbar-nav">
-					<c:if test="<%=(isAdmin == false)%>">
-						<li><a href="/rest-loan/user/login">Manager Login</a></li>
-					</c:if>
 					<li><a href="/rest-loan/loan/create">Apply</a></li>
 					<c:if test="<%=isAdmin%>">
 						<li><a href="/rest-loan/loan/list">Administration</a></li>

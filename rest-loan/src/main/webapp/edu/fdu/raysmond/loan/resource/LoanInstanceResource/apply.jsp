@@ -10,7 +10,7 @@
 	<h1>Complete loan application</h1>
 	<hr>
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-12">
 			<form class="form-horizontal" role="form">
 				<div class="form-group">
 					<label for="user_name" class="col-sm-3 control-label">User
@@ -60,7 +60,6 @@
 				</div>
 			</form>
 		</div>
-		<div class="col-sm-6"></div>
 	</div>
 </div>
 <script>

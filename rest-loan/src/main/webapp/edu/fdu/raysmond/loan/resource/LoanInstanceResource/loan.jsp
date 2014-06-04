@@ -8,7 +8,7 @@
 	<h1>Loan detail</h1>
 	<hr>
 	<div class="row">
-		<div class="col-sm-6">
+		<div class="col-sm-12">
 			<div class="col-sm-3">ID</div>
 			<div class="col-sm-9">${it.id}</div>
 			<div class="col-sm-3">Customer Name</div>
@@ -41,7 +41,6 @@
 				</c:choose>
 			</div>
 		</div>
-		<div class="col-sm-6"></div>
 	</div>
 </div>
 
