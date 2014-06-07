@@ -1,5 +1,7 @@
 package edu.fdu.raysmond.loan.resource;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 
 import javax.annotation.security.DenyAll;
@@ -47,8 +49,22 @@ public class LoanResource {
 
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response get() throws JSONException {
-		return Response.ok().entity(new JSONObject().put("uri", uri("loan/create").toString())).build();
+	public JSONObject get() throws JSONException {
+		//return Response.ok().entity(new JSONObject().put("uri", uri("loan/create").toString())).build();
+		JSONArray arr = new JSONArray();
+		for (String s : inputs) {
+			arr.put(s);
+		}
+		return new JSONObject().put("input", arr);
+	}
+	
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response newLoan(final JSONObject json) throws URISyntaxException {
+		int id = LoanController.store(json, uriInfo);
+		//String result = "Location: " + uri("loan/" + id);
+		return Response.created(new URI(uri("loan/" + id))).build();
+
 	}
 
 	@GET
